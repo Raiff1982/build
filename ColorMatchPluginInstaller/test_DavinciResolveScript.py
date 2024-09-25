@@ -1,20 +1,3 @@
-import os
-import shutil
-import unittest
-from unittest.mock import MagicMock, mock_open, patch
-
-import sys
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-try:
-	from DavinciResolveScript import install_plugin
-except ImportError:
-	import sys
-	sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-	from DavinciResolveScript import install_plugin
-
-# Assuming the function install_plugin is imported from DavinciResolveScript
-
 class TestInstallPlugin(unittest.TestCase):
 
 	@patch('os.path.exists')
@@ -41,7 +24,6 @@ class TestInstallPlugin(unittest.TestCase):
 		mock_isfile.assert_any_call('ColorMatchPlugin/file2.py')
 		mock_copy.assert_any_call('ColorMatchPlugin/file1.py', '/mocked/path')
 		mock_copy.assert_any_call('ColorMatchPlugin/file2.py', '/mocked/path')
-		print("Plugin installed successfully!")
 
 	@patch('os.path.exists')
 	@patch('os.makedirs')
@@ -68,7 +50,6 @@ class TestInstallPlugin(unittest.TestCase):
 		mock_isfile.assert_any_call('ColorMatchPlugin/file2.py')
 		mock_copy.assert_any_call('ColorMatchPlugin/file1.py', '/mocked/path')
 		mock_copy.assert_any_call('ColorMatchPlugin/file2.py', '/mocked/path')
-		print("Plugin installed successfully!")
 
 	@patch('os.path.exists', return_value=True)
 	@patch('os.makedirs')
@@ -84,7 +65,3 @@ class TestInstallPlugin(unittest.TestCase):
 
 		# Assertions
 		self.assertTrue("Listdir error" in str(context.exception))
-		print("Error installing plugin: Listdir error")
-
-if __name__ == '__main__':
-	unittest.main()
