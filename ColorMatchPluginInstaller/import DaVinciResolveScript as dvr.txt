@@ -1,0 +1,110 @@
+import os  # Standard library module for operating system interfaces
+import shutil
+import tkinter as tk
+from tkinter import filedialog, messagebox
+
+import DaVinciResolveScript as dvr  # type: ignore
+import exifread
+
+try:
+    import aces_color_module  # Ensure this module is available in your environment
+except ImportError:
+    print("aces_color_module is not available. Please ensure it is installed.")
+    aces_color_module = None
+
+# Function to install the plugin
+def install_plugin():
+    try:
+        plugin_dir = "ColorMatchPlugin"
+        if os.name == 'nt':  # Windows
+            resolve_plugin_dir = os.path.expanduser("~/AppData/Roaming/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Comp")
+        else:  # macOS and Linux
+            resolve_plugin_dir = os.path.expanduser("~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Comp")
+
+        if not os.path.exists(resolve_plugin_dir):
+            os.makedirs(resolve_plugin_dir)
+
+        if not os.path.exists(plugin_dir):
+            print(f"Plugin directory '{plugin_dir}' does not exist.")
+            return
+
+        for filename in os.listdir(plugin_dir):
+            full_file_name = os.path.join(plugin_dir, filename)
+            if os.path.isfile(full_file_name):
+                shutil.copy(full_file_name, resolve_plugin_dir)
+
+        print("Plugin installed successfully!")
+    except Exception as e:
+        print("Error installing plugin: {}".format(e))
+
+# Function to extract metadata
+def get_metadata(image_path):
+    try:
+        with open(image_path, 'rb') as f:
+            tags = exifread.process_file(f)
+        return tags
+    except Exception as e:
+        print("Error extracting metadata: {}".format(e))
+        return None
+
+# Function to match color using ACES standards
+def match_color(metadata):
+    if aces_color_module is None:
+            print("ACES color module is not available.")
+            return '#FFFFFF'  # Default to white color in case of error
+    
+        try:
+            # Convert metadata to ACES color
+            aces_color = aces_color_module.convert_to_aces(metadata)
+            # Convert ACES color to a format suitable for tkinter (e.g., hex color)
+            matched_color = '#%02x%02x%02x' % (int(aces_color[0] * 255), int(aces_color[1] * 255), int(aces_color[2] * 255))
+            return matched_color
+        except Exception as e:
+            print("Error matching color: {}".format(e))
+            return '#FFFFFF'  # Default to white color in case of error
+
+# Function to create a circle in the GUI
+def create_circle(x, y, r, canvas, color):
+    try:
+        canvas.create_oval(x - r, y - r, x + r, y + r, outline=color, fill=color, width=2)
+    except Exception as e:
+        print("Error creating circle: {}".format(e))
+
+# Function to handle right-click event
+def on_right_click(event, canvas):
+    try:
+        image_path = filedialog.askopenfilename()
+        if image_path:
+            metadata = get_metadata(image_path)
+            if metadata:
+                matched_color = match_color(metadata)
+                create_circle(event.x, event.y, 50, canvas, matched_color)
+            else:
+                messagebox.showerror("Error", "Failed to extract metadata.")
+        else:
+            messagebox.showwarning("Warning", "No file selected.")
+    except Exception as e:
+        print("Error handling right-click event: {}".format(e))
+
+# Main function to set up the GUI
+def main():
+    try:
+        root = tk.Tk()
+        root.title("Color Match GUI")
+        canvas = tk.Canvas(root, width=400, height=400)
+        canvas.pack()
+        canvas.bind("<Button-3>", lambda event: on_right_click(event, canvas))  # Right-click event
+        root.mainloop()
+    except Exception as e:
+        print("Error in main function: {}".format(e))
+
+# Initialize DaVinci Resolve
+try:
+    resolve = dvr.scriptapp("Resolve")
+    if resolve:
+        install_plugin()
+        main()
+    else:
+        print("DaVinci Resolve not found.")
+except Exception as e:
+    print(f"Error initializing DaVinci Resolve: {e}")

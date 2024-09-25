@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Source the activate script
+source /c:/Users/Harri/OneDrive/Desktop/plugin\ for\ resolve/build/.venv/Scripts/activate
+
+# Test if VIRTUAL_ENV is set correctly
+if [ "$VIRTUAL_ENV" != "C:/Users/Harri/OneDrive/Desktop/plugin for resolve/build/.venv" ]; then
+    echo "VIRTUAL_ENV is not set correctly"
+    exit 1
+fi
+
+# Test if PATH is updated correctly
+if [[ ":$PATH:" != *":C:/Users/Harri/OneDrive/Desktop/plugin for resolve/build/.venv/Scripts:"* ]]; then
+    echo "PATH is not updated correctly"
+    exit 1
+fi
+
+# Test if PYTHONHOME is unset
+if [ -n "$PYTHONHOME" ]; then
+    echo "PYTHONHOME is not unset"
+    exit 1
+fi
+
+# Test if PS1 is updated correctly
+if [[ "$PS1" != *"(.venv)"* ]]; then
+    echo "PS1 is not updated correctly"
+    exit 1
+fi
+
+echo "All tests passed"

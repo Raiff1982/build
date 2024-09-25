@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"name": "plugin for resolve",
+			"path": "."
+		}
+	],
+	"settings": {
+		"github.copilot.chat.experimental.inlineChatCompletionTrigger.enabled": true
+	}
+}

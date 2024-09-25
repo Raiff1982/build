@@ -1,0 +1,8 @@
+plugin_for_resolve/
+├── main.py
+├── scripts/
+│   └── DaVinciResolveScript.py
+├── modules/
+│   └── aces_color_module.py
+└── ColorMatchPlugin/
+    └── (plugin files)

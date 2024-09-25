@@ -1,0 +1,18 @@
+import shutil
+import os
+
+def install_plugin():
+    plugin_dir = "ColorMatchPlugin"
+    resolve_plugin_dir = os.path.expanduser("~/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Comp")
+
+    if not os.path.exists(resolve_plugin_dir):
+        os.makedirs(resolve_plugin_dir)
+
+    for filename in os.listdir(plugin_dir):
+        full_file_name = os.path.join(plugin_dir, filename)
+        if os.path.isfile(full_file_name):
+            shutil.copy(full_file_name, resolve_plugin_dir)
+
+    print("Plugin installed successfully!")
+
+install_plugin()
